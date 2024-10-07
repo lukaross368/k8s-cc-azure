@@ -1,7 +1,9 @@
 ## Concept 
 Cookie cutter / template for IAC + bootstrap self managed k8s cluster on azure. Building on kubernetes-the-hard-way 
 
-Reference: https://github.com/ivanfioravanti/kubernetes-the-hard-way-on-azure
+Reference: 
+-https://github.com/ivanfioravanti/kubernetes-the-hard-way-on-azure
+-https://kubernetes.io/docs/reference/setup-tools/kubeadm/
 
 ## High level Components
 
