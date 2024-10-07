@@ -7,16 +7,16 @@ References:
 
 ## High level Components
 
-Overall requirments are that a client should be able to run a github actions deployment pipeline providing only a single yaml file as input. This yaml file will act as the blueprint for your HA self managed cluster and the pipeline will deploy all Infra using a custom terraform module and boostrap everything using a custom anisble playbook. 
+Overall requirments are that a client should be able to run a github actions pipeline using some parameters. The pipeline should deploy all Infra using a custom terraform module and boostrap everything using kubeadm and then run some test scripts.
 
 ### IAC
 
 - terraform module to spin up and connect required azure infra
 - tests for terraform module
 
-### Playbook
+### Bootstrap
 
-- Ansible playbook to bootstrap instances and install required software
+- use kubeadm for bootstrapping 
 - Smoke test script to check cluster is up and running 
 
 ### Install Addons 
@@ -25,12 +25,12 @@ Overall requirments are that a client should be able to run a github actions dep
 
 ### Deployment Pipeline
 
-- repo should expose a github actions pipeline that looks at a config file and runs the module and playbook from this repo to deploy the solution 
+- repo should expose a github actions pipeline that takes some parameters and runs the module and scrips from this repo to deploy the solution 
 
 ### Repo House keeping 
 
 - some repo-wide static analysis / code formatting 
-- build pipeline that checks tests can be run, infra can be spun up and playbook can be executed sucessfully. (Exectued on PR to main)
+- build pipeline that checks tests can be run, infra can be spun up and scripts can be executed sucessfully. (Exectued on PR to main)
 
 ### Documentation 
 
