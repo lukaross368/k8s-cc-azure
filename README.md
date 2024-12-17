@@ -7,16 +7,16 @@ References:
 
 ## High level Components
 
-Overall requirments are that a client should be able to run a github actions pipeline using some parameters. The pipeline should deploy all Infra using a custom terraform module and boostrap everything using kubeadm and then run some test scripts.
+Overall requirments are that a client should be able to run a github actions pipeline using some parameters. The pipeline should deploy all Infra using a custom terraform module and bootstrap everything using kubeadm and then run some test scripts.
 
 ### IAC
 
-- terraform module to spin up and connect required azure infra
-- tests for terraform module
+- Pulumi Stack 
+- Tests
 
 ### Bootstrap
 
-- use kubeadm for bootstrapping 
+- use kubeadm package
 - Smoke test script to check cluster is up and running 
 
 ### Install Addons 
