@@ -9,6 +9,15 @@ References:
 
 Overall requirments are that a client should be able to run a github actions pipeline using some parameters. The pipeline should deploy all Infra using a custom terraform module and bootstrap everything using kubeadm and then run some test scripts.
 
+
+## TODO:
+
+- Add Repo QOL
+- Clean up logic
+- Use Azure SDK to move Pulumi state into azure and make configurable
+- Write Tests for infra deployment and program logic
+- Update Readme 
+
 ### IAC
 
 - Pulumi Stack 

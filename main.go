@@ -6,64 +6,72 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/lukaross368/k8s-cc-azure/config"
 	"github.com/lukaross368/k8s-cc-azure/infra"
+	"github.com/lukaross368/k8s-cc-azure/loggers"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 )
 
+var workDir string = "./pulumiState"
+var configPath string = "config.yaml"
+var stack auto.Stack
+var ctx context.Context = context.Background()
+
 func main() {
-
-	var stack auto.Stack
-
-	projectName := "k8s-cc"
-	environment := "dev"
-	workDir := "./pulumiState"
-
-	controlNodes := 2
-	workerNodes := 2
-
-	log.Printf("deploying with %v worker nodes and %v control nodes", workerNodes, controlNodes)
-
-	ctx := context.Background()
-
-	// Check for args
-
 	if len(os.Args) <= 1 {
-		log.Println("no argument provided. Use --create or --delete")
+		log.Println("No argument provided. Use --create or --delete")
 		os.Exit(1)
 	}
-
-	deleteRequested := false
+	deleteRequest := false
 	createRequest := false
+
 	for _, arg := range os.Args[1:] {
-		if arg == "--delete" {
-			deleteRequested = true
-			break
-		}
-		if arg == "--create" {
+		switch arg {
+		case "--delete":
+			deleteRequest = true
+		case "--create":
 			createRequest = true
-			break
+		case "-v":
+			loggers.Verbose = true
+			loggers.LogVerbose("Verbose mode enabled")
 		}
 	}
 
+	config, err := config.LoadConfig(configPath)
+	if err != nil {
+		log.Fatalf("Error loading config: %v", err)
+	} else {
+		loggers.LogVerbose("Config Successfully Loaded")
+	}
+
+	if createRequest {
+		loggers.LogVerbose("deploying with %v worker nodes and %v control nodes", config.Workers.Nodes, config.ControlPlane.Nodes)
+	}
+	loggers.LogVerbose("Using Environment: %s", config.Environment)
+	loggers.LogVerbose("Using ProjectName: %s", config.ProjectName)
+
+	// TODO: clean these up after adding azure remote backend
 	if err := os.Setenv("PULUMI_BACKEND_URL", "file://."); err != nil {
 		log.Printf("Failed to set PULUMI_BACKEND_URL: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := os.Setenv("PULUMI_CONFIG_PASSPHRASE", "******"); err != nil {
+	// TODO: clean these up after adding azure remote backend
+	if err := os.Setenv("PULUMI_CONFIG_PASSPHRASE", "strong-pass-word"); err != nil {
 		log.Printf("Failed to set PULUMI_CONFIG_PASSPHRASE: %v\n", err)
 		os.Exit(1)
 	}
 
-	pulumiProgram := infra.ReturnPulumiFunction()
+	pulumiProgram := infra.ReturnPulumiFunction(*config)
 
-	stack, err := auto.UpsertStackInlineSource(
+	stack, err = auto.UpsertStackInlineSource(
 		ctx,
-		environment,
-		projectName,
+		config.Environment,
+		config.ProjectName,
 		pulumiProgram,
 		auto.WorkDir(workDir),
 	)
+
 	if err != nil {
 		log.Printf("Failed to create or select stack: %v\n", err)
 		os.Exit(1)
@@ -85,7 +93,7 @@ func main() {
 		return
 	}
 
-	if deleteRequested {
+	if deleteRequest {
 		log.Println("Running `pulumi destroy` via the Automation API...")
 		_, err := stack.Destroy(ctx)
 		if err != nil {
@@ -94,7 +102,7 @@ func main() {
 		}
 		log.Println("Destroy succeeded!")
 
-		err = stack.Workspace().RemoveStack(ctx, environment)
+		err = stack.Workspace().RemoveStack(ctx, config.Environment)
 		if err != nil {
 			log.Printf("Failed to remove stack: %v\n", err)
 			os.Exit(1)
