@@ -1,0 +1,26 @@
+projectName: "k8s-cc"
+environment: "dev"
+region: "uksouth"
+dryRun: false
+
+networking:
+  addressPrefix: "10.0.0.0/16"
+  subnetCIDR: "10.0.0.0/24"
+
+controlPlane:
+  nodes: 2
+  controllerVMSize: "Standard_DS1_v2"
+  sshKeyPath: "/Users/luka/.ssh/id_ed25519.pub"
+  controllerNodeDiskSize: 30
+  controllerNodeDiskStorageAccountType: "Standard_LRS"
+  controllerNodeMachineImageSku: "18.04-LTS"
+  controllerNodeVMAdminUser: "kuberoot"
+
+workers:
+  nodes: 2
+  workerVMSize: "Standard_DS1_v2"
+  sshKeyPath: "/Users/luka/.ssh/id_ed25519.pub"
+  workerNodeDiskSize: 30
+  workerNodeDiskStorageAccountType: "Standard_LRS"
+  workerNodeMachineImageSku: "18.04-LTS"
+  workerNodeVMAdminUser: "kuberoot"
